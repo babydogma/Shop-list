@@ -383,3 +383,21 @@ input::placeholder {
     font-size: 18px;
 
 }
+
+.totals {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.total {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+.remaining {
+    font-size: 20px;
+    color: #555;
+}
