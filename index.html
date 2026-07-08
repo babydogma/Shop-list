@@ -1,85 +1,127 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
 
     <title>Список покупок</title>
 
     <link rel="stylesheet" href="style.css">
+
     <link rel="manifest" href="manifest.json">
 
     <meta name="theme-color" content="#ffffff">
+
 </head>
+
 
 <body>
 
+
 <div class="page">
+
 
     <h1>Список покупок</h1>
 
+
+
     <div class="input-row">
 
+
         <input 
-            id="item" 
-            type="text" 
+            id="item"
+            type="text"
             placeholder="Что купить"
         >
 
+
         <input 
-            id="price" 
-            type="number" 
+            id="price"
+            type="number"
             placeholder="Цена"
         >
 
-        <button onclick="addItem()">+</button>
+
+        <button onclick="addItem()">
+            +
+        </button>
+
 
     </div>
+
 
 
     <div id="list"></div>
 
 
+
     <div class="summary">
 
+
         <div class="total">
-            Итого: <span id="total">0</span> ₽
+
+            Итого:
+            <span id="total">0</span>
+            ₽
+
         </div>
 
 
-        <button 
-            class="archive-btn"
-            onclick="finishShopping()"
-        >
-            Завершить покупки
-        </button>
+
+        <div class="buttons">
+
+
+            <button 
+                class="archive-btn"
+                onclick="finishShopping()"
+            >
+                Завершить покупки
+            </button>
+
+
+
+            <a 
+                href="archive.html"
+                class="archive-link"
+            >
+                Архив покупок
+            </a>
+
+
+        </div>
+
 
     </div>
 
-
-    <section class="archive">
-
-        <h2>Архив покупок</h2>
-
-        <div id="archive-list"></div>
-
-    </section>
 
 
 </div>
 
 
+
 <script src="script.js"></script>
+
 
 
 <script>
 
 if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
+
+    navigator.serviceWorker.register(
+        "service-worker.js"
+    );
+
 }
 
 </script>
 
 
 </body>
+
 </html>
