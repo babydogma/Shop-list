@@ -29,16 +29,20 @@ function render() {
     list.innerHTML = "";
 
     let total = 0;
+let remaining = 0;
 
 
-    items.forEach((item, index) => {
+items.forEach((item, index) => {
 
 
-        if (!item.done) {
+    total += Number(item.price);
 
-            total += Number(item.price);
 
-        }
+    if (!item.done) {
+
+        remaining += Number(item.price);
+
+    }
 
 
         list.innerHTML += `
@@ -80,6 +84,8 @@ function render() {
 
 
     document.getElementById("total").textContent = total;
+
+document.getElementById("remaining").textContent = remaining;
 
 
 
