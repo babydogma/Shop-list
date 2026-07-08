@@ -171,23 +171,18 @@ function removeItem(index) {
 
 function finishShopping() {
 
-
     if (items.length === 0) {
-
         return;
-
     }
-
 
 
     archive.push({
 
         date: new Date().toLocaleString(),
 
-        products: items
+        products: [...items]
 
     });
-
 
 
     items = [];
