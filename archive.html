@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Архив покупок</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+<h1>Архив покупок</h1>
+
+
+<a href="index.html" class="archive-link">
+← Назад к покупкам
+</a>
+
+
+<div id="archive-list"></div>
+
+
+</div>
+
+
+
+<script>
+
+
+let archive =
+JSON.parse(localStorage.getItem("shoppingArchive")) || [];
+
+
+
+const box =
+document.getElementById("archive-list");
+
+
+
+archive.forEach(shop => {
+
+
+let html = `
+
+<div class="archive-block">
+
+<h3>${shop.date}</h3>
+
+`;
+
+
+
+shop.products.forEach(item => {
+
+
+html += `
+
+<div class="archive-item">
+
+${item.name} — ${item.price} ₽
+
+</div>
+
+`;
+
+
+});
+
+
+
+html += `</div>`;
+
+
+box.innerHTML += html;
+
+
+});
+
+
+
+</script>
+
+
+</body>
+
+</html>
