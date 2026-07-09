@@ -373,3 +373,48 @@ select:focus {
         min-width: 72px;
     }
 }
+
+/* Финальная полировка архива: фильтры и карточки не должны «ломать» тетрадную сетку. */
+.archive-filters {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(170px, 220px);
+    align-items: end;
+}
+
+.archive-stats {
+    justify-content: flex-start;
+    padding-inline: 6px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .24);
+}
+
+.archive-block {
+    overflow: hidden;
+    margin-inline: -6px 4px;
+}
+
+.archive-block-header {
+    min-height: var(--row);
+    background: rgba(189, 139, 53, .10);
+}
+
+.archive-products .archive-item:last-child {
+    border-bottom: 0;
+}
+
+.archive-item {
+    min-height: var(--row);
+    padding-inline: 0;
+    border-bottom: 1px dashed rgba(84, 142, 205, .24);
+}
+
+@media (max-width: 640px) {
+    .archive-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .archive-block-header,
+    .archive-item {
+        align-items: flex-end;
+    }
+}
