@@ -1,91 +1,134 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Список покупок</title>
-    <meta name="theme-color" content="#fff8e8">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#5b7cfa">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Покупки">
+  <title>Список покупок</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main class="notebook">
-        <section class="screen" aria-labelledby="page-title">
-            <header class="top">
-                <h1 id="page-title">Список покупок</h1>
-            </header>
+  <main class="app-shell" data-screen="home">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">PWA приложение</p>
+        <h1>Список покупок</h1>
+      </div>
+      <a class="icon-button archive-link" href="archive.html" aria-label="Открыть архив">📦</a>
+    </header>
 
-            <form class="add-form" id="add-form" autocomplete="off">
-                <label class="field field-name" for="item">
-                    <span class="field-label">Что купить</span>
-                    <input
-                        id="item"
-                        name="item"
-                        type="text"
-                        placeholder="молоко, хлеб, кофе"
-                        required
-                    >
-                </label>
+    <section class="card add-card" aria-labelledby="add-title">
+      <h2 id="add-title">Добавить товар</h2>
+      <form id="item-form" class="item-form" autocomplete="off">
+        <label>
+          <span>Название товара</span>
+          <input id="name" name="name" type="text" inputmode="text" placeholder="Например, молоко" required maxlength="80">
+        </label>
 
-                <label class="field field-quantity" for="quantity">
-                    <span class="field-label">Количество</span>
-                    <input
-                        id="quantity"
-                        name="quantity"
-                        type="number"
-                        inputmode="numeric"
-                        min="1"
-                        step="1"
-                        placeholder="1"
-                    >
-                </label>
+        <div class="form-grid">
+          <label>
+            <span>Цена за единицу</span>
+            <input id="price" name="price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="89" required>
+          </label>
 
-                <label class="field field-price" for="price">
-                    <span class="field-label">Цена</span>
-                    <input
-                        id="price"
-                        name="price"
-                        type="number"
-                        inputmode="decimal"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                    >
-                </label>
+          <label>
+            <span>Количество</span>
+            <input id="quantity" name="quantity" type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="2" value="1" required>
+          </label>
+        </div>
 
-                <button class="add-button" type="submit">
-                    Добавить
-                </button>
-            </form>
+        <label>
+          <span>Категория</span>
+          <select id="category" name="category">
+            <option value="Продукты">Продукты</option>
+            <option value="Дом">Дом</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </label>
 
-            <section class="list-wrap" aria-label="Текущий список покупок">
-                <div class="shopping-list" id="list"></div>
-            </section>
+        <button class="primary-button" type="submit">Добавить</button>
+      </form>
+    </section>
 
-            <footer class="bottom-panel">
-                <div class="totals" aria-label="Итоги">
-                    <div class="total-line">
-                        <span>Всего</span>
-                        <strong><span id="total">0</span> ₽</strong>
-                    </div>
-                    <div class="total-line remaining-line">
-                        <span>Осталось</span>
-                        <strong><span id="remaining">0</span> ₽</strong>
-                    </div>
-                </div>
+    <section class="totals-card" aria-label="Суммы покупок">
+      <div>
+        <span>Всего</span>
+        <strong id="total-sum">0 ₽</strong>
+      </div>
 
-                <div class="actions">
-                    <button class="primary-button" id="finish-shopping" type="button">
-                        Завершить покупки
-                    </button>
+      <div>
+        <span>Осталось</span>
+        <strong id="left-sum">0 ₽</strong>
+      </div>
+    </section>
 
-                    <a class="secondary-button" href="archive.html">
-                        Архив покупок
-                    </a>
-                </div>
-            </footer>
-        </section>
-    </main>
+    <section class="list-section" aria-labelledby="list-title">
+      <div class="section-heading">
+        <h2 id="list-title">Текущий список</h2>
+        <span id="items-count">0 товаров</span>
+      </div>
+
+      <div id="items-list" class="items-list"></div>
+
+      <p id="empty-state" class="empty-state">
+        Добавьте первый товар — список сохранится на телефоне автоматически.
+      </p>
+    </section>
+
+    <button id="finish-button" class="finish-button" type="button">
+      Завершить покупки
+    </button>
+  </main>
+
+  <dialog id="edit-dialog" class="edit-dialog">
+    <form id="edit-form" method="dialog" class="card dialog-card">
+      <h2>Редактировать товар</h2>
+
+      <input id="edit-id" type="hidden">
+
+      <label>
+        <span>Название</span>
+        <input id="edit-name" type="text" required maxlength="80">
+      </label>
+
+      <div class="form-grid">
+        <label>
+          <span>Цена</span>
+          <input id="edit-price" type="number" min="0" step="0.01" required>
+        </label>
+
+        <label>
+          <span>Количество</span>
+          <input id="edit-quantity" type="number" min="0.01" step="0.01" required>
+        </label>
+      </div>
+
+      <label>
+        <span>Категория</span>
+        <select id="edit-category">
+          <option value="Продукты">Продукты</option>
+          <option value="Дом">Дом</option>
+          <option value="Другое">Другое</option>
+        </select>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="secondary-button" value="cancel" type="button" id="cancel-edit">
+          Отмена
+        </button>
+
+        <button class="primary-button" value="default" type="submit">
+          Сохранить
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="script.js" defer></script>
 </body>
 </html>
