@@ -1,97 +1,44 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Архив покупок</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Архив покупок</title>
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#f8f0d8">
 </head>
-
-
 <body>
+    <main class="page">
+        <section class="sheet-card" aria-labelledby="archive-title">
+            <header class="hero line-row">
+                <p class="eyebrow">прошлые чеки</p>
+                <h1 id="archive-title">Архив покупок</h1>
+            </header>
 
+            <nav class="archive-nav line-row" aria-label="Навигация">
+                <a href="index.html" class="archive-link back-link">← Назад к покупкам</a>
+            </nav>
 
-<div class="page">
+            <section class="archive-filters line-row" aria-label="Фильтры архива">
+                <label class="field filter-search" for="archive-search">
+                    <span>Найти продукт</span>
+                    <input id="archive-search" type="search" placeholder="например, кофе" autocomplete="off">
+                </label>
+                <label class="field filter-sort" for="archive-sort">
+                    <span>Порядок</span>
+                    <select id="archive-sort">
+                        <option value="newest">сначала новые</option>
+                        <option value="oldest">сначала старые</option>
+                        <option value="expensive">дороже</option>
+                    </select>
+                </label>
+            </section>
 
+            <div class="archive-stats line-row" id="archive-stats"></div>
+            <div class="archive-list" id="archive-list" aria-live="polite"></div>
+        </section>
+    </main>
 
-<h1>Архив покупок</h1>
-
-
-<a href="index.html" class="archive-link">
-← Назад к покупкам
-</a>
-
-
-<div id="archive-list"></div>
-
-
-</div>
-
-
-
-<script>
-
-
-let archive =
-JSON.parse(localStorage.getItem("shoppingArchive")) || [];
-
-
-
-const box =
-document.getElementById("archive-list");
-
-
-
-archive.forEach(shop => {
-
-
-let html = `
-
-<div class="archive-block">
-
-<h3>${shop.date}</h3>
-
-`;
-
-
-
-shop.products.forEach(item => {
-
-
-html += `
-
-<div class="archive-item">
-
-${item.name} — ${item.price} ₽
-
-</div>
-
-`;
-
-
-});
-
-
-
-html += `</div>`;
-
-
-box.innerHTML += html;
-
-
-});
-
-
-
-</script>
-
-
+    <script src="script.js"></script>
 </body>
-
 </html>
