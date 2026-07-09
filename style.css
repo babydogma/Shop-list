@@ -1,14 +1,19 @@
 :root {
-    --ink: #263040;
-    --muted-ink: #6c6470;
-    --gold: #bd8b35;
-    --gold-dark: #8d6424;
     --paper: #fffaf0;
-    --paper-edge: #f1dfbb;
-    --line: rgba(84, 142, 205, .34);
-    --margin-line: rgba(191, 65, 61, .75);
-    --shadow: 0 28px 80px rgba(38, 31, 21, .22);
-    --row: 42px;
+    --paper-warm: #fbf3df;
+    --ink: #18263d;
+    --muted: #77717c;
+    --line: rgba(95, 151, 205, .28);
+    --red-line: rgba(194, 59, 62, .72);
+    --gold: #b98324;
+    --gold-dark: #8c6118;
+    --danger: #b7403b;
+    --row: 40px;
+    --left-margin: 34px;
+    --content-left: 46px;
+    --content-right: 16px;
+    --ui-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    --hand-font: "Marker Felt", "Bradley Hand", "Segoe Print", "Comic Sans MS", cursive;
 }
 
 * {
@@ -23,10 +28,12 @@ body {
     min-height: 100%;
     overflow-x: hidden;
     color: var(--ink);
-    font-family: "Segoe Print", "Comic Sans MS", "Trebuchet MS", cursive;
-    background:
-        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .8), transparent 32%),
-        linear-gradient(135deg, #3a2c25 0%, #745a3c 45%, #211815 100%);
+    background: var(--paper);
+    font-family: var(--ui-font);
+}
+
+body {
+    min-height: 100svh;
 }
 
 button,
@@ -35,36 +42,64 @@ select {
     font: inherit;
 }
 
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
 .page {
-    width: 100vw;
-    min-height: 100vh;
-    padding: clamp(18px, 4vw, 46px);
+    width: 100%;
+    min-height: 100svh;
+    background:
+        radial-gradient(circle at 14px 20px, rgba(60, 55, 50, .18) 0 6px, transparent 7px) 0 0 / 100% 80px repeat-y,
+        linear-gradient(90deg, transparent 0, transparent calc(var(--left-margin) - 1px), var(--red-line) var(--left-margin), var(--red-line) calc(var(--left-margin) + 2px), transparent calc(var(--left-margin) + 3px)),
+        repeating-linear-gradient(to bottom, var(--paper) 0, var(--paper) calc(var(--row) - 1px), var(--line) var(--row));
 }
 
 .sheet-card {
-    position: relative;
-    width: min(100%, 980px);
-    min-height: calc(100vh - clamp(36px, 8vw, 92px));
-    margin: 0 auto;
-    padding: 0 clamp(22px, 5vw, 72px) 56px clamp(36px, 7vw, 96px);
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, .72);
-    border-radius: 26px;
-    background:
-        linear-gradient(90deg, transparent 0, transparent calc(100% - 50px), var(--margin-line) calc(100% - 49px), var(--margin-line) calc(100% - 47px), transparent calc(100% - 46px)),
-        repeating-linear-gradient(to bottom, var(--paper) 0, var(--paper) calc(var(--row) - 1px), var(--line) var(--row)),
-        linear-gradient(90deg, rgba(255, 255, 255, .82), rgba(255, 249, 231, .88));
-    box-shadow: var(--shadow), inset 0 0 60px rgba(184, 139, 63, .12);
+    width: 100%;
+    min-height: 100svh;
+    padding: calc(var(--row) * 1.25) var(--content-right) calc(var(--row) * 2) var(--content-left);
+    background: transparent;
 }
 
-.sheet-card::before {
-    content: "";
-    position: absolute;
-    inset: 0 auto 0 20px;
-    width: 16px;
-    background: radial-gradient(circle, rgba(61, 57, 68, .38) 0 4px, transparent 5px) center 21px / 16px 84px repeat-y;
-    pointer-events: none;
+/* Header */
+
+.hero {
+    min-height: calc(var(--row) * 2);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 4px;
 }
+
+.eyebrow {
+    order: 1;
+    margin: 0;
+    color: var(--gold-dark);
+    font-family: var(--ui-font);
+    font-size: 11px;
+    line-height: 14px;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+h1 {
+    order: 2;
+    margin: 0;
+    max-width: 100%;
+    color: var(--ink);
+    font-family: var(--hand-font);
+    font-size: clamp(31px, 9vw, 40px);
+    line-height: var(--row);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Общая строка тетради */
 
 .line-row {
     min-height: var(--row);
@@ -73,642 +108,454 @@ select {
     padding-bottom: 5px;
 }
 
-.hero {
-    min-height: calc(var(--row) * 3);
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-end;
-}
+/* Form */
 
-.eyebrow {
-    margin: 0;
-    color: var(--gold-dark);
-    font-size: 14px;
-    letter-spacing: .22em;
-    text-transform: uppercase;
-}
-
-h1 {
-    margin: 0;
-    font-family: "Brush Script MT", "Segoe Script", cursive;
-    font-size: clamp(42px, 9vw, 72px);
-    line-height: var(--row);
-    font-weight: 400;
-    color: #1f2e45;
-    text-shadow: 0 1px 0 #fff, 0 10px 22px rgba(58, 44, 37, .14);
-}
-
-.input-row,
-.archive-filters {
-    gap: 14px;
+.input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 62px;
+    gap: 0 10px;
     margin-top: var(--row);
-    flex-wrap: wrap;
 }
 
 .field {
-    display: flex;
-    min-width: 160px;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 0;
+    min-width: 0;
+    display: block;
+}
+
+.field-name {
+    grid-column: 1 / -1;
+    min-height: var(--row);
+}
+
+.field-price {
+    grid-column: 1 / 2;
+    min-height: var(--row);
 }
 
 .field span {
-    color: var(--muted-ink);
-    font-size: 12px;
-    line-height: 14px;
-    letter-spacing: .08em;
+    display: block;
+    height: 15px;
+    color: var(--muted);
+    font-family: var(--ui-font);
+    font-size: 10px;
+    line-height: 15px;
+    font-weight: 800;
+    letter-spacing: .09em;
     text-transform: uppercase;
-}
-
-.field-name,
-.filter-search {
-    flex: 1 1 300px;
-}
-
-.field-price,
-.filter-sort {
-    flex: 0 1 150px;
 }
 
 input,
 select {
+    display: block;
     width: 100%;
-    height: 28px;
-    padding: 0 2px;
+    height: 25px;
+    padding: 0;
     border: 0;
     border-radius: 0;
-    outline: none;
+    outline: 0;
     color: var(--ink);
     background: transparent;
-    font-size: 19px;
-    line-height: 28px;
-}
-
-select {
-    cursor: pointer;
+    font-size: 20px;
+    line-height: 25px;
 }
 
 input::placeholder {
-    color: rgba(38, 48, 64, .38);
+    color: rgba(24, 38, 61, .38);
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
 }
 
 input:focus,
 select:focus {
-    box-shadow: 0 3px 0 rgba(189, 139, 53, .38);
-}
-
-.add-btn,
-.archive-btn,
-.archive-link {
-    min-height: 32px;
-    border: 1px solid rgba(141, 100, 36, .36);
-    border-radius: 999px;
-    color: #fff;
-    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
-    box-shadow: 0 10px 22px rgba(141, 100, 36, .18);
-    cursor: pointer;
-    text-decoration: none;
-    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 2px 0 rgba(185, 131, 36, .4);
 }
 
 .add-btn {
-    width: 48px;
+    grid-column: 2 / 3;
+    align-self: end;
+    width: 62px;
     height: 34px;
-    flex: 0 0 48px;
-    padding: 0;
-    font-size: 30px;
-    line-height: 26px;
+    margin-bottom: 3px;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(135deg, #c9932c, var(--gold-dark));
+    box-shadow: 0 8px 18px rgba(140, 97, 24, .24);
+    font-size: 28px;
+    line-height: 30px;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-.archive-btn,
-.archive-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 18px;
-    font-size: 16px;
-}
+/* Shopping list */
 
-.add-btn:hover,
-.archive-btn:hover,
-.archive-link:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 14px 26px rgba(141, 100, 36, .24);
-}
-
-.list,
-.archive-list {
+.list {
     margin-top: var(--row);
 }
 
 .item {
-    gap: 12px;
-    font-size: 20px;
+    min-height: var(--row);
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) 74px 30px;
+    gap: 8px;
+    align-items: end;
+    padding-bottom: 5px;
+    color: var(--ink);
+    font-family: var(--hand-font);
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
 }
 
 .item input {
-    width: 21px;
-    height: 21px;
+    width: 23px;
+    height: 23px;
+    margin: 0 0 1px;
     accent-color: var(--gold);
-    flex: 0 0 auto;
 }
 
-.item-name,
-.archive-item span:first-child {
-    flex: 1;
+.item-name {
+    min-width: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
+.item-name.done,
 .done {
     opacity: .5;
     text-decoration: line-through;
     text-decoration-thickness: 2px;
 }
 
-.item-price,
-.archive-item-price,
-.archive-total {
-    min-width: 92px;
+.item-price {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ink);
     text-align: right;
-    color: #31435c;
-    font-weight: 700;
+    white-space: nowrap;
+    font-size: 16px;
 }
 
 .delete {
-    width: 31px;
-    height: 31px;
-    flex: 0 0 31px;
+    width: 30px;
+    height: 30px;
+    margin: 0 0 -1px;
     border: 0;
     border-radius: 50%;
-    color: #a93d38;
-    background: rgba(169, 61, 56, .08);
-    cursor: pointer;
+    color: var(--danger);
+    background: rgba(183, 64, 59, .08);
     font-size: 24px;
     line-height: 24px;
+    cursor: pointer;
 }
 
+/* Summary */
+
 .summary {
-    min-height: calc(var(--row) * 2);
-    justify-content: space-between;
-    gap: 18px;
+    display: block;
+    min-height: calc(var(--row) * 4);
     margin-top: var(--row);
-    flex-wrap: wrap;
+    padding-bottom: 0;
 }
 
 .totals {
+    min-height: calc(var(--row) * 2);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    gap: 4px;
+    gap: 0;
+    font-family: var(--hand-font);
 }
 
 .total {
-    font-size: 24px;
-    font-weight: 700;
+    color: var(--ink);
+    font-size: 27px;
+    line-height: 30px;
+    font-weight: 800;
 }
 
 .remaining {
-    color: var(--muted-ink);
-    font-size: 19px;
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
 }
 
 .buttons {
-    display: flex;
-    align-items: flex-end;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.archive-btn,
+.archive-link {
+    width: 100%;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(135deg, #c9932c, var(--gold-dark));
+    box-shadow: 0 8px 18px rgba(140, 97, 24, .22);
+    font-family: var(--ui-font);
+    font-size: 16px;
+    line-height: 20px;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .back-link {
     color: var(--gold-dark);
-    background: rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid rgba(140, 97, 24, .22);
+    box-shadow: none;
 }
 
-.archive-nav,
-.archive-stats {
+/* Archive */
+
+.archive-nav {
     margin-top: var(--row);
 }
 
+.archive-filters {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin-top: var(--row);
+}
+
+.filter-search,
+.filter-sort {
+    min-height: var(--row);
+}
+
 .archive-stats {
-    color: var(--muted-ink);
-    font-size: 17px;
+    min-height: var(--row);
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 6px;
+    color: var(--muted);
+    font-family: var(--hand-font);
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 700;
+}
+
+.archive-list {
+    margin-top: var(--row);
 }
 
 .archive-block {
-    margin-bottom: var(--row);
-    border-radius: 18px;
-    background: rgba(255, 255, 255, .34);
-    box-shadow: inset 0 0 0 1px rgba(141, 100, 36, .12);
+    margin: 0 0 var(--row);
+    background: transparent;
 }
 
 .archive-block-header {
-    justify-content: space-between;
-    gap: 16px;
-    padding-inline: 16px;
+    min-height: var(--row);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 72px;
+    gap: 8px;
+    align-items: end;
+    padding-bottom: 5px;
 }
 
 .archive-date {
     margin: 0;
-    font-size: 21px;
-    font-weight: 700;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ink);
+    font-family: var(--hand-font);
+    font-size: 18px;
+    line-height: 25px;
+    font-weight: 800;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.archive-total {
+    overflow: hidden;
+    color: var(--ink);
+    font-family: var(--hand-font);
+    font-size: 16px;
+    line-height: 25px;
+    font-weight: 800;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .archive-products {
-    padding: 0 16px 6px;
+    padding: 0;
 }
 
 .archive-item {
-    justify-content: space-between;
-    gap: 16px;
+    min-height: var(--row);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 68px;
+    gap: 8px;
+    align-items: end;
+    padding-bottom: 5px;
+    color: var(--ink);
+    font-family: var(--hand-font);
     font-size: 18px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
+.archive-item span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.archive-item-price {
+    overflow: hidden;
+    color: var(--ink);
+    text-align: right;
+    white-space: nowrap;
+    font-size: 16px;
 }
 
 .empty-state {
-    color: var(--muted-ink);
-    font-size: 18px;
+    min-height: var(--row);
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 6px;
+    color: var(--muted);
+    font-family: var(--hand-font);
+    font-size: 17px;
+    line-height: 22px;
 }
 
-@media (max-width: 640px) {
+/* Very small phones */
+
+@media (max-width: 380px) {
     :root {
-        --row: 40px;
+        --content-left: 42px;
+        --content-right: 12px;
     }
 
-    .page {
-        padding: 0;
-    }
-
-    .sheet-card {
-        min-height: 100vh;
-        border-radius: 0;
-        padding-inline: 30px 28px;
-    }
-
-    .sheet-card::before {
-        left: 8px;
-    }
-
-    .input-row,
-    .archive-filters,
-    .buttons {
-        align-items: stretch;
-    }
-
-    .add-btn,
-    .archive-btn,
-    .archive-link {
-        width: 100%;
+    h1 {
+        font-size: 30px;
     }
 
     .item {
-        gap: 8px;
-        font-size: 17px;
+        grid-template-columns: 23px minmax(0, 1fr) 62px 28px;
+        gap: 6px;
+        font-size: 16px;
     }
 
     .item-price,
     .archive-item-price,
     .archive-total {
-        min-width: 72px;
-    }
-}
-
-/* Финальная полировка архива: фильтры и карточки не должны «ломать» тетрадную сетку. */
-.archive-filters {
-    display: grid;
-    grid-template-columns: minmax(220px, 1fr) minmax(170px, 220px);
-    align-items: end;
-}
-
-.archive-stats {
-    justify-content: flex-start;
-    padding-inline: 6px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .24);
-}
-
-.archive-block {
-    overflow: hidden;
-    margin-inline: -6px 4px;
-}
-
-.archive-block-header {
-    min-height: var(--row);
-    background: rgba(189, 139, 53, .10);
-}
-
-.archive-products .archive-item:last-child {
-    border-bottom: 0;
-}
-
-.archive-item {
-    min-height: var(--row);
-    padding-inline: 0;
-    border-bottom: 1px dashed rgba(84, 142, 205, .24);
-}
-
-@media (max-width: 640px) {
-    .archive-filters {
-        grid-template-columns: 1fr;
+        font-size: 14px;
     }
 
-    .archive-block-header,
+    .archive-block-header {
+        grid-template-columns: minmax(0, 1fr) 62px;
+    }
+
     .archive-item {
-        align-items: flex-end;
+        grid-template-columns: minmax(0, 1fr) 62px;
+        font-size: 16px;
     }
 }
 
-/* Mobile-first correction: телефоны важнее десктопа. */
-:root {
-    --hand-font: "Marker Felt", "Bradley Hand", "Segoe Print", "Comic Sans MS", "Trebuchet MS", cursive;
-    --ui-font: "Trebuchet MS", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+/* Desktop/tablet: аккуратная карточка, но не влияет на телефон */
 
-body {
-    font-family: var(--hand-font);
-}
-
-input,
-select,
-button {
-    font-family: var(--ui-font);
-}
-
-.item-name,
-.item-price,
-.archive-date,
-.archive-total,
-.archive-item,
-.total,
-.remaining,
-.empty-state,
-.archive-stats {
-    font-family: var(--hand-font);
-}
-
-@media (max-width: 640px) {
+@media (min-width: 760px) {
     :root {
-        --row: 44px;
+        --row: 42px;
+        --left-margin: auto;
+        --content-left: 74px;
+        --content-right: 74px;
     }
 
     body {
-        background: var(--paper);
+        background:
+            radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .8), transparent 32%),
+            linear-gradient(135deg, #3a2c25 0%, #745a3c 45%, #211815 100%);
     }
 
     .page {
-        width: 100%;
-        min-height: 100svh;
-        padding: 0;
+        padding: 42px;
+        background: transparent;
     }
 
     .sheet-card {
-        width: 100%;
-        min-height: 100svh;
-        padding: 0 18px 44px 30px;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
+        width: min(100%, 980px);
+        min-height: calc(100vh - 84px);
+        margin: 0 auto;
+        padding: calc(var(--row) * 1.4) 74px 64px 92px;
+        border: 1px solid rgba(255, 255, 255, .72);
+        border-radius: 26px;
         background:
-            linear-gradient(90deg, transparent 0, transparent calc(100% - 22px), var(--margin-line) calc(100% - 21px), var(--margin-line) calc(100% - 19px), transparent calc(100% - 18px)),
+            radial-gradient(circle at 24px 20px, rgba(60, 55, 50, .18) 0 6px, transparent 7px) 0 0 / 100% 84px repeat-y,
+            linear-gradient(90deg, transparent 0, transparent calc(100% - 48px), var(--red-line) calc(100% - 47px), var(--red-line) calc(100% - 45px), transparent calc(100% - 44px)),
             repeating-linear-gradient(to bottom, var(--paper) 0, var(--paper) calc(var(--row) - 1px), var(--line) var(--row));
-    }
-
-    .sheet-card::before {
-        left: 7px;
-        width: 12px;
-        opacity: .55;
-        background-size: 12px 88px;
-    }
-
-    .line-row {
-        min-height: var(--row);
-        align-items: flex-end;
-        padding-bottom: 6px;
+        box-shadow: 0 28px 80px rgba(38, 31, 21, .22);
     }
 
     .hero {
         min-height: calc(var(--row) * 3);
     }
 
-    .eyebrow {
-        font-size: 11px;
-        letter-spacing: .16em;
-        line-height: 14px;
-    }
-
     h1 {
-        max-width: calc(100vw - 58px);
-        font-size: clamp(36px, 11vw, 48px);
-        line-height: var(--row);
-        white-space: normal;
+        font-size: clamp(44px, 7vw, 68px);
     }
 
     .input-row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 58px;
-        gap: 0 10px;
-        align-items: end;
-        margin-top: var(--row);
-    }
-
-    .field {
-        min-width: 0;
+        grid-template-columns: minmax(0, 1fr) 160px 58px;
     }
 
     .field-name {
-        grid-column: 1 / -1;
-        min-height: var(--row);
+        grid-column: 1 / 2;
     }
 
     .field-price {
-        grid-column: 1 / 2;
-        min-height: var(--row);
+        grid-column: 2 / 3;
     }
 
     .add-btn {
-        grid-column: 2 / 3;
-        width: 58px;
-        height: 34px;
-        align-self: end;
-        margin-bottom: 5px;
-    }
-
-    .field span {
-        height: 14px;
-        font-size: 10px;
-        line-height: 14px;
-    }
-
-    input,
-    select {
-        height: 30px;
-        font-size: 18px;
-        line-height: 30px;
-    }
-
-    .list,
-    .archive-list {
-        margin-top: var(--row);
+        grid-column: 3 / 4;
     }
 
     .item {
-        min-height: var(--row);
-        gap: 7px;
-        font-size: 18px;
-    }
-
-    .item input {
-        width: 20px;
-        height: 20px;
-        margin: 0;
-    }
-
-    .item-name {
-        min-width: 0;
-        padding-right: 2px;
-    }
-
-    .item-price {
-        min-width: 62px;
-        max-width: 62px;
-        font-size: 16px;
-    }
-
-    .delete {
-        width: 28px;
-        height: 28px;
-        flex-basis: 28px;
-        font-size: 22px;
+        grid-template-columns: 24px minmax(0, 1fr) 96px 32px;
+        font-size: 20px;
     }
 
     .summary {
-        display: block;
-        min-height: calc(var(--row) * 4);
-        margin-top: var(--row);
-        padding-bottom: 0;
-    }
-
-    .totals {
-        min-height: calc(var(--row) * 2);
-        justify-content: flex-end;
-    }
-
-    .total {
-        font-size: 22px;
-        line-height: 28px;
-    }
-
-    .remaining {
-        font-size: 18px;
-        line-height: 24px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
     }
 
     .buttons {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-        margin-top: 8px;
-    }
-
-    .archive-btn,
-    .archive-link {
-        width: 100%;
-        min-height: 36px;
-        font-size: 15px;
-    }
-
-    .archive-nav {
-        margin-top: var(--row);
+        min-width: 260px;
     }
 
     .archive-filters {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0;
-        margin-top: var(--row);
-    }
-
-    .filter-search,
-    .filter-sort {
-        min-height: var(--row);
-    }
-
-    .archive-stats {
-        min-height: var(--row);
-        padding-inline: 0;
-        font-size: 15px;
-        line-height: 20px;
-        background: transparent;
-    }
-
-    .archive-block {
-        margin: 0 0 var(--row);
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
+        grid-template-columns: minmax(0, 1fr) 220px;
+        gap: 14px;
     }
 
     .archive-block-header {
-        min-height: var(--row);
-        gap: 8px;
-        padding-inline: 0;
-        background: transparent;
-    }
-
-    .archive-date {
-        min-width: 0;
-        font-size: 17px;
-        line-height: 24px;
-    }
-
-    .archive-total {
-        min-width: 70px;
-        max-width: 70px;
-        font-size: 16px;
-    }
-
-    .archive-products {
-        padding: 0;
+        grid-template-columns: minmax(0, 1fr) 100px;
     }
 
     .archive-item {
-        min-height: var(--row);
-        gap: 8px;
-        font-size: 17px;
-        line-height: 24px;
-        border-bottom: 0;
-    }
-
-    .archive-item-price {
-        min-width: 66px;
-        max-width: 66px;
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 380px) {
-    .sheet-card {
-        padding-left: 26px;
-        padding-right: 14px;
-    }
-
-    h1 {
-        font-size: 34px;
-    }
-
-    .item {
-        font-size: 16px;
-    }
-
-    .item-price {
-        min-width: 56px;
-        max-width: 56px;
-        font-size: 14px;
-    }
-
-    .archive-date,
-    .archive-item {
-        font-size: 16px;
+        grid-template-columns: minmax(0, 1fr) 90px;
     }
 }
