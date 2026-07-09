@@ -193,9 +193,25 @@ function renderArchive() {
     });
 }
 
+function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+    });
+
+    navigator.serviceWorker.register("service-worker.js")
+        .then(registration => registration.update())
+        .catch(error => console.warn("Не удалось обновить service worker", error));
+}
+
 document.getElementById("add-form")?.addEventListener("submit", addItem);
 document.getElementById("archive-search")?.addEventListener("input", renderArchive);
 document.getElementById("archive-sort")?.addEventListener("change", renderArchive);
 
 render();
 renderArchive();
+registerServiceWorker();
