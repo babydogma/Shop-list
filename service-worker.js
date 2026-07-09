@@ -1,7 +1,8 @@
-const CACHE="shopping-list-v1";
+const CACHE="shopping-list-v2";
 const FILES=[
 "./",
 "./index.html",
+"./archive.html",
 "./style.css",
 "./script.js",
 "./manifest.json"

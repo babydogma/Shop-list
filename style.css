@@ -1,7 +1,19 @@
+:root {
+    --ink: #263040;
+    --muted-ink: #6c6470;
+    --gold: #bd8b35;
+    --gold-dark: #8d6424;
+    --paper: #fffaf0;
+    --paper-edge: #f1dfbb;
+    --line: rgba(84, 142, 205, .34);
+    --margin-line: rgba(191, 65, 61, .75);
+    --shadow: 0 28px 80px rgba(38, 31, 21, .22);
+    --row: 42px;
+}
+
 * {
     box-sizing: border-box;
 }
-
 
 html,
 body {
@@ -10,394 +22,354 @@ body {
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
-
-    font-family: Arial, sans-serif;
-    background: #fff;
+    color: var(--ink);
+    font-family: "Segoe Print", "Comic Sans MS", "Trebuchet MS", cursive;
+    background:
+        radial-gradient(circle at 20% 10%, rgba(255, 255, 255, .8), transparent 32%),
+        linear-gradient(135deg, #3a2c25 0%, #745a3c 45%, #211815 100%);
 }
 
-
-body {
-    display: block;
+button,
+input,
+select {
+    font: inherit;
 }
-
 
 .page {
     width: 100vw;
     min-height: 100vh;
+    padding: clamp(18px, 4vw, 46px);
+}
 
+.sheet-card {
     position: relative;
-
-    padding: 35px 70px 40px 25px;
-
+    width: min(100%, 980px);
+    min-height: calc(100vh - clamp(36px, 8vw, 92px));
+    margin: 0 auto;
+    padding: 0 clamp(22px, 5vw, 72px) 56px clamp(36px, 7vw, 96px);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 26px;
     background:
-        repeating-linear-gradient(
-            to bottom,
-            #ffffff 0px,
-            #ffffff 39px,
-            #c7dcff 40px
-        );
-
+        linear-gradient(90deg, transparent 0, transparent calc(100% - 50px), var(--margin-line) calc(100% - 49px), var(--margin-line) calc(100% - 47px), transparent calc(100% - 46px)),
+        repeating-linear-gradient(to bottom, var(--paper) 0, var(--paper) calc(var(--row) - 1px), var(--line) var(--row)),
+        linear-gradient(90deg, rgba(255, 255, 255, .82), rgba(255, 249, 231, .88));
+    box-shadow: var(--shadow), inset 0 0 60px rgba(184, 139, 63, .12);
 }
 
-
-/* красная линия тетради */
-
-.page::after {
-
+.sheet-card::before {
     content: "";
-
     position: absolute;
-
-    right: 45px;
-    top: 0;
-    bottom: 0;
-
-    width: 2px;
-
-    background: #e84b3c;
-
+    inset: 0 auto 0 20px;
+    width: 16px;
+    background: radial-gradient(circle, rgba(61, 57, 68, .38) 0 4px, transparent 5px) center 21px / 16px 84px repeat-y;
     pointer-events: none;
-
 }
 
+.line-row {
+    min-height: var(--row);
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 5px;
+}
 
-/* Заголовок */
+.hero {
+    min-height: calc(var(--row) * 3);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+}
+
+.eyebrow {
+    margin: 0;
+    color: var(--gold-dark);
+    font-size: 14px;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+}
 
 h1 {
-
-    margin: 0 0 45px;
-
-    font-family: "Brush Script MT",
-                 "Segoe Script",
-                 cursive;
-
-    font-size: 48px;
-
-    line-height: 40px;
-
-    font-weight: normal;
-
+    margin: 0;
+    font-family: "Brush Script MT", "Segoe Script", cursive;
+    font-size: clamp(42px, 9vw, 72px);
+    line-height: var(--row);
+    font-weight: 400;
+    color: #1f2e45;
+    text-shadow: 0 1px 0 #fff, 0 10px 22px rgba(58, 44, 37, .14);
 }
 
+.input-row,
+.archive-filters {
+    gap: 14px;
+    margin-top: var(--row);
+    flex-wrap: wrap;
+}
 
-
-/* Добавление товара */
-
-.input-row {
-
+.field {
     display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-bottom: 30px;
-
+    min-width: 160px;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0;
 }
 
+.field span {
+    color: var(--muted-ink);
+    font-size: 12px;
+    line-height: 14px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
 
+.field-name,
+.filter-search {
+    flex: 1 1 300px;
+}
 
-input {
+.field-price,
+.filter-sort {
+    flex: 0 1 150px;
+}
 
+input,
+select {
+    width: 100%;
+    height: 28px;
+    padding: 0 2px;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    color: var(--ink);
     background: transparent;
-
-    border: none;
-
-    border-bottom: 2px solid #555;
-
-    height: 40px;
-
-    padding: 0 5px;
-
-    font-size: 18px;
-
+    font-size: 19px;
+    line-height: 28px;
 }
 
-
-
-#item {
-
-    flex: 1;
-
-    min-width: 0;
-
+select {
+    cursor: pointer;
 }
-
-
-
-#price {
-
-    width: 90px;
-
-}
-
-
 
 input::placeholder {
-
-    color: #999;
-
-    font-weight: bold;
-
+    color: rgba(38, 48, 64, .38);
 }
 
+input:focus,
+select:focus {
+    box-shadow: 0 3px 0 rgba(189, 139, 53, .38);
+}
 
+.add-btn,
+.archive-btn,
+.archive-link {
+    min-height: 32px;
+    border: 1px solid rgba(141, 100, 36, .36);
+    border-radius: 999px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    box-shadow: 0 10px 22px rgba(141, 100, 36, .18);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
 
-/* кнопка плюс */
-
-.input-row button {
-
-    width: 50px;
-
-    height: 50px;
-
-    border: none;
-
-    background: #333;
-
-    color: white;
-
-    font-size: 34px;
-
-    line-height: 50px;
-
+.add-btn {
+    width: 48px;
+    height: 34px;
+    flex: 0 0 48px;
     padding: 0;
-
-    flex-shrink: 0;
-
+    font-size: 30px;
+    line-height: 26px;
 }
 
+.archive-btn,
+.archive-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 18px;
+    font-size: 16px;
+}
 
+.add-btn:hover,
+.archive-btn:hover,
+.archive-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px rgba(141, 100, 36, .24);
+}
 
-/* строки списка */
+.list,
+.archive-list {
+    margin-top: var(--row);
+}
 
 .item {
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
+    gap: 12px;
     font-size: 20px;
-
 }
-
-
-
-/* чекбокс */
 
 .item input {
-
-    width: 22px;
-
-    height: 22px;
-
-    margin: 0 12px 0 0;
-
+    width: 21px;
+    height: 21px;
+    accent-color: var(--gold);
+    flex: 0 0 auto;
 }
 
-
-
-/* название */
-
-.item-name {
-
+.item-name,
+.archive-item span:first-child {
     flex: 1;
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    padding-top: 4px;
-
     overflow: hidden;
-
     white-space: nowrap;
-
     text-overflow: ellipsis;
-
 }
 
-
-
-.item-name.done {
-
-    text-decoration: line-through;
-
+.done {
     opacity: .5;
-
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
 }
 
-
-
-/* цена */
-
-.item-price {
-
-    width: 80px;
-
+.item-price,
+.archive-item-price,
+.archive-total {
+    min-width: 92px;
     text-align: right;
-
-    padding-top: 4px;
-
+    color: #31435c;
+    font-weight: 700;
 }
-
-
-
-/* удалить */
 
 .delete {
-
-    margin-left: 10px;
-
-    color: #e33;
-
-    font-size: 28px;
-
-    line-height: 40px;
-
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
+    border: 0;
+    border-radius: 50%;
+    color: #a93d38;
+    background: rgba(169, 61, 56, .08);
+    cursor: pointer;
+    font-size: 24px;
+    line-height: 24px;
 }
-
-
-
-/* итог */
 
 .summary {
-
-    margin-top: 35px;
-
-}
-
-
-
-.total {
-
-    font-size: 24px;
-
-    font-weight: bold;
-
-}
-
-
-
-/* завершить покупки */
-
-.archive-btn {
-
-    margin-top: 20px;
-
-    width: 100%;
-
-    height: 45px;
-
-    border: none;
-
-    background: #333;
-
-    color: white;
-
-    font-size: 16px;
-
-}
-
-
-
-/* архив */
-
-.archive {
-
-    margin-top: 45px;
-
-}
-
-
-
-.archive h2 {
-
-    font-size: 22px;
-
-    margin-bottom: 15px;
-
-}
-
-
-
-.archive-item {
-
-    padding: 10px 0;
-
-    border-bottom: 1px solid #ccc;
-
-}
-
-.buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 25px;
-}
-
-
-.archive-link {
-
-    display: block;
-
-    text-align: center;
-
-    text-decoration: none;
-
-    color: #333;
-
-    font-size: 18px;
-
-}
-
-
-.archive-block {
-
-    margin-top: 30px;
-
-}
-
-
-.archive-block h3 {
-
-    margin-bottom: 15px;
-
-}
-
-
-.archive-item {
-
-    height: 40px;
-
-    display: flex;
-
-    align-items: center;
-
-    border-bottom: 1px solid #ccc;
-
-    font-size: 18px;
-
+    min-height: calc(var(--row) * 2);
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: var(--row);
+    flex-wrap: wrap;
 }
 
 .totals {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    justify-content: flex-end;
+    gap: 4px;
 }
-
 
 .total {
     font-size: 24px;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-
 .remaining {
-    font-size: 20px;
-    color: #555;
+    color: var(--muted-ink);
+    font-size: 19px;
+}
+
+.buttons {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.back-link {
+    color: var(--gold-dark);
+    background: rgba(255, 255, 255, .5);
+}
+
+.archive-nav,
+.archive-stats {
+    margin-top: var(--row);
+}
+
+.archive-stats {
+    color: var(--muted-ink);
+    font-size: 17px;
+}
+
+.archive-block {
+    margin-bottom: var(--row);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .34);
+    box-shadow: inset 0 0 0 1px rgba(141, 100, 36, .12);
+}
+
+.archive-block-header {
+    justify-content: space-between;
+    gap: 16px;
+    padding-inline: 16px;
+}
+
+.archive-date {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.archive-products {
+    padding: 0 16px 6px;
+}
+
+.archive-item {
+    justify-content: space-between;
+    gap: 16px;
+    font-size: 18px;
+}
+
+.empty-state {
+    color: var(--muted-ink);
+    font-size: 18px;
+}
+
+@media (max-width: 640px) {
+    :root {
+        --row: 40px;
+    }
+
+    .page {
+        padding: 0;
+    }
+
+    .sheet-card {
+        min-height: 100vh;
+        border-radius: 0;
+        padding-inline: 30px 28px;
+    }
+
+    .sheet-card::before {
+        left: 8px;
+    }
+
+    .input-row,
+    .archive-filters,
+    .buttons {
+        align-items: stretch;
+    }
+
+    .add-btn,
+    .archive-btn,
+    .archive-link {
+        width: 100%;
+    }
+
+    .item {
+        gap: 8px;
+        font-size: 17px;
+    }
+
+    .item-price,
+    .archive-item-price,
+    .archive-total {
+        min-width: 72px;
+    }
 }

@@ -1,136 +1,53 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta 
-        name="viewport" 
-        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Список покупок</title>
-
     <link rel="stylesheet" href="style.css">
-
     <link rel="manifest" href="manifest.json">
-
-    <meta name="theme-color" content="#ffffff">
-
+    <meta name="theme-color" content="#f8f0d8">
 </head>
-
-
 <body>
+    <main class="page">
+        <section class="sheet-card" aria-labelledby="page-title">
+            <header class="hero line-row">
+                <p class="eyebrow">личная тетрадь</p>
+                <h1 id="page-title">Список покупок</h1>
+            </header>
 
+            <form class="input-row line-row" id="add-form">
+                <label class="field field-name" for="item">
+                    <span>Название</span>
+                    <input id="item" type="text" placeholder="молоко, хлеб, кофе" autocomplete="off" required>
+                </label>
+                <label class="field field-price" for="price">
+                    <span>Цена</span>
+                    <input id="price" type="number" placeholder="0" min="0" step="0.01" inputmode="decimal">
+                </label>
+                <button type="submit" class="add-btn" aria-label="Добавить продукт">+</button>
+            </form>
 
-<div class="page">
+            <div class="list" id="list" aria-live="polite"></div>
 
+            <section class="summary line-row" aria-label="Итоги списка">
+                <div class="totals">
+                    <div class="total">Всего: <span id="total">0</span> ₽</div>
+                    <div class="remaining">Осталось: <span id="remaining">0</span> ₽</div>
+                </div>
+                <div class="buttons">
+                    <button class="archive-btn" type="button" onclick="finishShopping()">Завершить покупки</button>
+                    <a href="archive.html" class="archive-link">Архив покупок</a>
+                </div>
+            </section>
+        </section>
+    </main>
 
-    <h1>Список покупок</h1>
-
-
-
-    <div class="input-row">
-
-
-        <input 
-            id="item"
-            type="text"
-            placeholder="Что купить"
-        >
-
-
-        <input 
-            id="price"
-            type="number"
-            placeholder="Цена"
-        >
-
-
-        <button onclick="addItem()">
-            +
-        </button>
-
-
-    </div>
-
-
-
-    <div id="list"></div>
-
-
-
-    <div class="summary">
-
-
-        <div class="totals">
-
-    <div class="total">
-        Всего:
-        <span id="total">0</span>
-        ₽
-    </div>
-
-
-    <div class="remaining">
-        Осталось:
-        <span id="remaining">0</span>
-        ₽
-    </div>
-
-</div>
-
-
-
-        <div class="buttons">
-
-
-            <button 
-                class="archive-btn"
-                onclick="finishShopping()"
-            >
-                Завершить покупки
-            </button>
-
-
-
-            <a 
-                href="archive.html"
-                class="archive-link"
-            >
-                Архив покупок
-            </a>
-
-
-        </div>
-
-
-    </div>
-
-
-
-</div>
-
-
-
-<script src="script.js"></script>
-
-
-
-<script>
-
-if ("serviceWorker" in navigator) {
-
-    navigator.serviceWorker.register(
-        "service-worker.js"
-    );
-
-}
-
-</script>
-
-
+    <script src="script.js"></script>
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js");
+        }
+    </script>
 </body>
-
 </html>
