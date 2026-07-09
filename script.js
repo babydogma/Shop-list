@@ -1,300 +1,314 @@
-const STORAGE_KEYS = {
-    shopping: "shopping",
-    archive: "shoppingArchive"
+const STORAGE_KEY = 'shopping-pwa-state-v1';
+const money = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
+
+const defaultState = {
+  items: [],
+  archive: []
 };
 
-let items = readArray(STORAGE_KEYS.shopping);
-let archive = readArray(STORAGE_KEYS.archive);
+let state = loadState();
+let currentSort = 'new';
 
-function readArray(key) {
-    try {
-        const value = JSON.parse(localStorage.getItem(key));
-        return Array.isArray(value) ? value : [];
-    } catch {
-        return [];
-    }
+function loadState() {
+  try {
+    return {
+      ...defaultState,
+      ...JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
+    };
+  } catch {
+    return structuredClone(defaultState);
+  }
 }
 
-function saveData() {
-    localStorage.setItem(STORAGE_KEYS.shopping, JSON.stringify(items));
-    localStorage.setItem(STORAGE_KEYS.archive, JSON.stringify(archive));
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-function money(value) {
-    return new Intl.NumberFormat("ru-RU", {
-        maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+function formatCurrency(value) {
+  return `${money.format(Math.round((Number(value) || 0) * 100) / 100)} ₽`;
 }
 
-function normalizePrice(value) {
-    const price = Number(String(value).replace(",", "."));
-    return Number.isFinite(price) && price > 0 ? price : 0;
+function itemSum(item) {
+  return Number(item.price) * Number(item.quantity);
 }
 
-function create(tag, className, text) {
-    const element = document.createElement(tag);
+function pluralItems(count) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
 
-    if (className) {
-        element.className = className;
-    }
+  if (mod10 === 1 && mod100 !== 11) {
+    return `${count} товар`;
+  }
 
-    if (text !== undefined) {
-        element.textContent = text;
-    }
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${count} товара`;
+  }
 
-    return element;
+  return `${count} товаров`;
 }
 
-function getShopTotal(shop) {
-    return shop.products.reduce((sum, item) => sum + normalizePrice(item.price), 0);
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[char]));
 }
 
-function getArchiveTime(shop, index) {
-    const parsed = Date.parse(shop.createdAt || "");
-    return Number.isFinite(parsed) ? parsed : index;
+function initPwa() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js').catch(console.error);
+  }
 }
 
-function renderShoppingList() {
-    const list = document.getElementById("list");
-    const totalNode = document.getElementById("total");
-    const remainingNode = document.getElementById("remaining");
+function initHome() {
+  const form = document.querySelector('#item-form');
+  const list = document.querySelector('#items-list');
+  const empty = document.querySelector('#empty-state');
+  const finish = document.querySelector('#finish-button');
+  const dialog = document.querySelector('#edit-dialog');
+  const editForm = document.querySelector('#edit-form');
 
-    if (!list || !totalNode || !remainingNode) {
-        return;
-    }
-
-    list.replaceChildren();
-
-    let total = 0;
-    let remaining = 0;
-
-    if (items.length === 0) {
-        list.append(create("p", "empty-row", "Список пуст"));
-    }
-
-    items.forEach((item, index) => {
-        const price = normalizePrice(item.price) * (Number(item.quantity) || 1);
-
-        total += price;
-
-        if (!item.done) {
-            remaining += price;
-        }
-
-        const row = create("article", "shopping-item");
-
-        const checkbox = create("input", "item-check");
-        checkbox.type = "checkbox";
-        checkbox.checked = Boolean(item.done);
-        checkbox.setAttribute("aria-label", `Отметить ${item.name}`);
-        checkbox.addEventListener("change", () => toggleDone(index));
-
-        const name = create("span", `item-name${item.done ? " done" : ""}`, item.name);
-        const itemPrice = create("span", "item-price", `${money(price)} ₽`);
-
-        const edit = create("button", "edit-button", "✎");
-        edit.type = "button";
-        edit.addEventListener("click", () => editItem(index));
-
-        const remove = create("button", "delete-button", "×");
-        remove.type = "button";
-        remove.setAttribute("aria-label", `Удалить ${item.name}`);
-        remove.addEventListener("click", () => removeItem(index));
-
-        row.append(checkbox, name, itemPrice, edit, remove);
-        list.append(row);
-    });
-
-    totalNode.textContent = money(total);
-    remainingNode.textContent = money(remaining);
-}
-
-function addItem(event) {
+  form.addEventListener('submit', event => {
     event.preventDefault();
 
-    const nameInput = document.getElementById("item");
-    const priceInput = document.getElementById("price");
-    const quantityInput = document.getElementById("quantity");
+    const data = new FormData(form);
 
-    if (!nameInput || !priceInput) {
-        return;
-    }
-
-    const name = nameInput.value.trim();
-
-    if (!name) {
-        nameInput.focus();
-        return;
-    }
-
-    items.push({
-        name,
-        price: normalizePrice(priceInput.value),
-        quantity: Number(quantityInput?.value) || 1,
-        done: false
+    state.items.push({
+      id: crypto.randomUUID(),
+      name: data.get('name').trim(),
+      price: Number(data.get('price')),
+      quantity: Number(data.get('quantity')),
+      category: data.get('category'),
+      done: false,
+      createdAt: Date.now()
     });
 
-    saveData();
-    renderShoppingList();
+    saveState();
 
-    nameInput.value = "";
-    priceInput.value = "";
-    if (quantityInput) quantityInput.value = "";
-    nameInput.focus();
-}
+    form.reset();
+    document.querySelector('#quantity').value = 1;
 
-function editItem(index) {
-    const item = items[index];
-    if (!item) return;
+    renderHome();
+    document.querySelector('#name').focus();
+  });
 
-    const name = prompt("Название товара", item.name);
-    const price = prompt("Цена за единицу", item.price);
-    const quantity = prompt("Количество", item.quantity || 1);
+  list.addEventListener('click', event => {
+    const card = event.target.closest('.item-card');
 
-    if (name !== null) item.name = name.trim() || item.name;
-    if (price !== null) item.price = normalizePrice(price);
-    if (quantity !== null) item.quantity = Number(quantity) || 1;
-
-    saveData();
-    renderShoppingList();
-}
-
-function toggleDone(index) {
-    if (!items[index]) {
-        return;
+    if (!card) {
+      return;
     }
 
-    items[index].done = !items[index].done;
-    saveData();
-    renderShoppingList();
-}
+    const item = state.items.find(entry => entry.id === card.dataset.id);
 
-function removeItem(index) {
-    items.splice(index, 1);
-    saveData();
-    renderShoppingList();
-}
-
-function finishShopping() {
-    if (items.length === 0) {
-        return;
+    if (!item) {
+      return;
     }
 
-    archive.push({
-        date: new Date().toLocaleString("ru-RU", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }),
-        createdAt: new Date().toISOString(),
-        products: items.map(item => ({ ...item }))
+    if (event.target.matches('[data-action="delete"]')) {
+      state.items = state.items.filter(entry => entry.id !== item.id);
+      saveState();
+      renderHome();
+    }
+
+    if (event.target.matches('[data-action="edit"]')) {
+      document.querySelector('#edit-id').value = item.id;
+      document.querySelector('#edit-name').value = item.name;
+      document.querySelector('#edit-price').value = item.price;
+      document.querySelector('#edit-quantity').value = item.quantity;
+      document.querySelector('#edit-category').value = item.category;
+
+      dialog.showModal();
+    }
+  });
+
+  list.addEventListener('change', event => {
+    if (!event.target.matches('[data-action="toggle"]')) {
+      return;
+    }
+
+    const item = state.items.find(entry => {
+      return entry.id === event.target.closest('.item-card').dataset.id;
     });
 
-    items = [];
-    saveData();
-    renderShoppingList();
-}
-
-function renderArchive() {
-    const list = document.getElementById("archive-list");
-
-    if (!list) {
-        return;
+    if (item) {
+      item.done = event.target.checked;
+      saveState();
+      renderHome();
     }
+  });
 
-    const stats = document.getElementById("archive-stats");
-    const searchInput = document.getElementById("archive-search");
-    const sortInput = document.getElementById("archive-sort");
+  editForm.addEventListener('submit', event => {
+    event.preventDefault();
 
-    const query = searchInput?.value.trim().toLowerCase() || "";
-    const sort = sortInput?.value || "newest";
-
-    let shops = archive
-        .map((shop, index) => ({ ...shop, originalIndex: index }))
-        .filter(shop => {
-            if (!query) {
-                return true;
-            }
-
-            return shop.products.some(product => {
-                return product.name.toLowerCase().includes(query);
-            });
-        });
-
-    shops.sort((a, b) => {
-        if (sort === "oldest") {
-            return getArchiveTime(a, a.originalIndex) - getArchiveTime(b, b.originalIndex);
-        }
-
-        if (sort === "expensive") {
-            return getShopTotal(b) - getShopTotal(a);
-        }
-
-        return getArchiveTime(b, b.originalIndex) - getArchiveTime(a, a.originalIndex);
+    const item = state.items.find(entry => {
+      return entry.id === document.querySelector('#edit-id').value;
     });
 
-    list.replaceChildren();
+    if (item) {
+      item.name = document.querySelector('#edit-name').value.trim();
+      item.price = Number(document.querySelector('#edit-price').value);
+      item.quantity = Number(document.querySelector('#edit-quantity').value);
+      item.category = document.querySelector('#edit-category').value;
 
-    const productsCount = shops.reduce((sum, shop) => sum + shop.products.length, 0);
-    const amount = shops.reduce((sum, shop) => sum + getShopTotal(shop), 0);
-
-    if (stats) {
-        stats.textContent = `Записей: ${shops.length} · товаров: ${productsCount} · сумма: ${money(amount)} ₽`;
+      saveState();
+      renderHome();
     }
 
-    if (shops.length === 0) {
-        list.append(create("p", "empty-row", "В архиве ничего не найдено"));
-        return;
+    dialog.close();
+  });
+
+  document.querySelector('#cancel-edit').addEventListener('click', () => {
+    dialog.close();
+  });
+
+  finish.addEventListener('click', () => {
+    if (!state.items.length) {
+      return;
     }
 
-    shops.forEach(shop => {
-        const card = create("article", "archive-card");
-
-        const header = create("header", "archive-card-header");
-
-        const date = create("h2", "archive-date", shop.date);
-        const total = create("strong", "archive-total", `${money(getShopTotal(shop))} ₽`);
-
-        header.append(date, total);
-
-        const products = create("div", "archive-products");
-
-        shop.products.forEach(product => {
-            const row = create("div", "archive-product");
-
-            const name = create("span", product.done ? "done" : "", product.name);
-            const price = create("span", "archive-product-price", `${money(product.price)} ₽`);
-
-            row.append(name, price);
-            products.append(row);
-        });
-
-        card.append(header, products);
-        list.append(card);
+    state.archive.unshift({
+      id: crypto.randomUUID(),
+      date: new Date().toISOString(),
+      items: state.items.map(item => ({ ...item })),
+      total: state.items.reduce((sum, item) => sum + itemSum(item), 0)
     });
+
+    state.items = [];
+
+    saveState();
+    renderHome();
+  });
+
+  function renderHome() {
+    const sorted = [...state.items].sort((a, b) => {
+      return Number(a.done) - Number(b.done) || a.createdAt - b.createdAt;
+    });
+
+    list.innerHTML = sorted.map(item => `
+      <article class="item-card ${item.done ? 'done' : ''}" data-id="${item.id}">
+        <input
+          type="checkbox"
+          data-action="toggle"
+          ${item.done ? 'checked' : ''}
+          aria-label="Отметить купленным"
+        >
+
+        <div class="item-main">
+          <div class="item-name">${escapeHtml(item.name)}</div>
+
+          <div class="item-meta">
+            ${formatCurrency(item.price)} × ${money.format(item.quantity)} = ${formatCurrency(itemSum(item))}
+          </div>
+
+          <span class="category-pill">${escapeHtml(item.category)}</span>
+        </div>
+
+        <div class="item-actions">
+          <button class="small-action" data-action="edit" aria-label="Редактировать">✏️</button>
+          <button class="small-action delete" data-action="delete" aria-label="Удалить">×</button>
+        </div>
+      </article>
+    `).join('');
+
+    const total = state.items.reduce((sum, item) => sum + itemSum(item), 0);
+
+    const left = state.items
+      .filter(item => !item.done)
+      .reduce((sum, item) => sum + itemSum(item), 0);
+
+    document.querySelector('#total-sum').textContent = formatCurrency(total);
+    document.querySelector('#left-sum').textContent = formatCurrency(left);
+    document.querySelector('#items-count').textContent = pluralItems(state.items.length);
+
+    empty.hidden = state.items.length > 0;
+    finish.disabled = state.items.length === 0;
+  }
+
+  renderHome();
 }
 
-function registerServiceWorker() {
-    if (!("serviceWorker" in navigator)) {
-        return;
+function initArchive() {
+  const search = document.querySelector('#search');
+  const list = document.querySelector('#archive-list');
+  const empty = document.querySelector('#archive-empty');
+
+  document.querySelector('.filter-row').addEventListener('click', event => {
+    if (!event.target.matches('.filter-chip')) {
+      return;
     }
 
-    navigator.serviceWorker.register("service-worker.js")
-        .then(registration => registration.update())
-        .catch(() => {});
-}
+    currentSort = event.target.dataset.sort;
 
-function init() {
-    document.getElementById("add-form")?.addEventListener("submit", addItem);
-    document.getElementById("finish-shopping")?.addEventListener("click", finishShopping);
-    document.getElementById("archive-search")?.addEventListener("input", renderArchive);
-    document.getElementById("archive-sort")?.addEventListener("change", renderArchive);
+    document.querySelectorAll('.filter-chip').forEach(button => {
+      button.classList.toggle('active', button === event.target);
+    });
 
-    renderShoppingList();
     renderArchive();
-    registerServiceWorker();
+  });
+
+  search.addEventListener('input', renderArchive);
+
+  function renderArchive() {
+    const query = search.value.trim().toLowerCase();
+
+    let entries = state.archive.filter(entry => {
+      const date = new Date(entry.date).toLocaleDateString('ru-RU');
+
+      return entry.items.some(item => item.name.toLowerCase().includes(query))
+        || date.includes(query);
+    });
+
+    entries = entries.sort((a, b) => {
+      if (currentSort === 'old') {
+        return new Date(a.date) - new Date(b.date);
+      }
+
+      if (currentSort === 'sum') {
+        return b.total - a.total;
+      }
+
+      return new Date(b.date) - new Date(a.date);
+    });
+
+    list.innerHTML = entries.map(entry => `
+      <article class="archive-entry">
+        <div class="archive-date">${new Date(entry.date).toLocaleDateString('ru-RU')}</div>
+
+        <div class="archive-items">
+          ${entry.items.map(item => `
+            <div class="archive-item">
+              ${escapeHtml(item.name)} — ${formatCurrency(itemSum(item))}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="archive-total">
+          Итог: ${formatCurrency(entry.total)}
+        </div>
+      </article>
+    `).join('');
+
+    const spent = state.archive.reduce((sum, entry) => sum + Number(entry.total), 0);
+
+    document.querySelector('#archive-count').textContent = state.archive.length;
+    document.querySelector('#archive-total').textContent = formatCurrency(spent);
+
+    empty.hidden = entries.length > 0;
+  }
+
+  renderArchive();
 }
 
-init();
+initPwa();
+
+if (document.body.querySelector('[data-screen="home"]')) {
+  initHome();
+}
+
+if (document.body.querySelector('[data-screen="archive"]')) {
+  initArchive();
+}
