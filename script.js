@@ -3,16 +3,15 @@ const STORAGE_KEYS = {
     archive: "shoppingArchive"
 };
 
-let items = readStorage(STORAGE_KEYS.shopping, []);
-let archive = readStorage(STORAGE_KEYS.archive, []);
+let items = readArray(STORAGE_KEYS.shopping);
+let archive = readArray(STORAGE_KEYS.archive);
 
-function readStorage(key, fallback) {
+function readArray(key) {
     try {
         const value = JSON.parse(localStorage.getItem(key));
-        return Array.isArray(value) ? value : fallback;
-    } catch (error) {
-        console.warn(`Не удалось прочитать ${key}`, error);
-        return fallback;
+        return Array.isArray(value) ? value : [];
+    } catch {
+        return [];
     }
 }
 
@@ -21,31 +20,48 @@ function saveData() {
     localStorage.setItem(STORAGE_KEYS.archive, JSON.stringify(archive));
 }
 
-function formatMoney(value) {
+function money(value) {
     return new Intl.NumberFormat("ru-RU", {
         maximumFractionDigits: 2
     }).format(Number(value) || 0);
 }
 
-function getShopTotal(shop) {
-    return shop.products.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+function normalizePrice(value) {
+    const price = Number(String(value).replace(",", "."));
+    return Number.isFinite(price) && price > 0 ? price : 0;
 }
 
-function getArchiveTime(shop) {
-    const parsed = Date.parse(shop.createdAt || "");
-    return Number.isFinite(parsed) ? parsed : shop.originalIndex;
-}
-
-function createElement(tag, className, text) {
+function create(tag, className, text) {
     const element = document.createElement(tag);
-    if (className) element.className = className;
-    if (text !== undefined) element.textContent = text;
+
+    if (className) {
+        element.className = className;
+    }
+
+    if (text !== undefined) {
+        element.textContent = text;
+    }
+
     return element;
 }
 
-function render() {
+function getShopTotal(shop) {
+    return shop.products.reduce((sum, item) => sum + normalizePrice(item.price), 0);
+}
+
+function getArchiveTime(shop, index) {
+    const parsed = Date.parse(shop.createdAt || "");
+    return Number.isFinite(parsed) ? parsed : index;
+}
+
+function renderShoppingList() {
     const list = document.getElementById("list");
-    if (!list) return;
+    const totalNode = document.getElementById("total");
+    const remainingNode = document.getElementById("remaining");
+
+    if (!list || !totalNode || !remainingNode) {
+        return;
+    }
 
     list.replaceChildren();
 
@@ -53,24 +69,30 @@ function render() {
     let remaining = 0;
 
     if (items.length === 0) {
-        list.append(createElement("p", "empty-state line-row", "Пока пусто — добавьте первую покупку на строку выше."));
+        list.append(create("p", "empty-row", "Список пуст"));
     }
 
     items.forEach((item, index) => {
-        const price = Number(item.price) || 0;
+        const price = normalizePrice(item.price);
+
         total += price;
-        if (!item.done) remaining += price;
 
-        const row = createElement("div", "item line-row");
+        if (!item.done) {
+            remaining += price;
+        }
 
-        const checkbox = createElement("input");
+        const row = create("article", "shopping-item");
+
+        const checkbox = create("input", "item-check");
         checkbox.type = "checkbox";
         checkbox.checked = Boolean(item.done);
+        checkbox.setAttribute("aria-label", `Отметить ${item.name}`);
         checkbox.addEventListener("change", () => toggleDone(index));
 
-        const name = createElement("span", `item-name${item.done ? " done" : ""}`, item.name);
-        const itemPrice = createElement("span", "item-price", `${formatMoney(price)} ₽`);
-        const remove = createElement("button", "delete", "×");
+        const name = create("span", `item-name${item.done ? " done" : ""}`, item.name);
+        const itemPrice = create("span", "item-price", `${money(price)} ₽`);
+
+        const remove = create("button", "delete-button", "×");
         remove.type = "button";
         remove.setAttribute("aria-label", `Удалить ${item.name}`);
         remove.addEventListener("click", () => removeItem(index));
@@ -79,17 +101,21 @@ function render() {
         list.append(row);
     });
 
-    document.getElementById("total").textContent = formatMoney(total);
-    document.getElementById("remaining").textContent = formatMoney(remaining);
+    totalNode.textContent = money(total);
+    remainingNode.textContent = money(remaining);
 }
 
 function addItem(event) {
-    event?.preventDefault();
+    event.preventDefault();
 
     const nameInput = document.getElementById("item");
     const priceInput = document.getElementById("price");
+
+    if (!nameInput || !priceInput) {
+        return;
+    }
+
     const name = nameInput.value.trim();
-    const price = Number(priceInput.value);
 
     if (!name) {
         nameInput.focus();
@@ -98,12 +124,12 @@ function addItem(event) {
 
     items.push({
         name,
-        price: Number.isFinite(price) && price > 0 ? price : 0,
+        price: normalizePrice(priceInput.value),
         done: false
     });
 
     saveData();
-    render();
+    renderShoppingList();
 
     nameInput.value = "";
     priceInput.value = "";
@@ -111,107 +137,141 @@ function addItem(event) {
 }
 
 function toggleDone(index) {
-    if (!items[index]) return;
+    if (!items[index]) {
+        return;
+    }
+
     items[index].done = !items[index].done;
     saveData();
-    render();
+    renderShoppingList();
 }
 
 function removeItem(index) {
     items.splice(index, 1);
     saveData();
-    render();
+    renderShoppingList();
 }
 
 function finishShopping() {
-    if (items.length === 0) return;
+    if (items.length === 0) {
+        return;
+    }
 
     archive.push({
-        date: new Date().toLocaleString("ru-RU"),
+        date: new Date().toLocaleString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }),
         createdAt: new Date().toISOString(),
-        products: [...items]
+        products: items.map(item => ({ ...item }))
     });
 
     items = [];
     saveData();
-    render();
+    renderShoppingList();
 }
 
 function renderArchive() {
-    const box = document.getElementById("archive-list");
-    if (!box) return;
+    const list = document.getElementById("archive-list");
 
-    const searchInput = document.getElementById("archive-search");
-    const sortInput = document.getElementById("archive-sort");
-    const stats = document.getElementById("archive-stats");
-    const query = searchInput?.value.trim().toLowerCase() || "";
-    const sort = sortInput?.value || "newest";
-
-    let filtered = archive
-        .map((shop, originalIndex) => ({ ...shop, originalIndex }))
-        .filter(shop => !query || shop.products.some(item => item.name.toLowerCase().includes(query)));
-
-    filtered.sort((a, b) => {
-        if (sort === "oldest") return getArchiveTime(a) - getArchiveTime(b);
-        if (sort === "expensive") return getShopTotal(b) - getShopTotal(a);
-        return getArchiveTime(b) - getArchiveTime(a);
-    });
-
-    box.replaceChildren();
-
-    const totalProducts = filtered.reduce((sum, shop) => sum + shop.products.length, 0);
-    const totalAmount = filtered.reduce((sum, shop) => sum + getShopTotal(shop), 0);
-    if (stats) {
-        stats.textContent = `Записей: ${filtered.length} • товаров: ${totalProducts} • сумма: ${formatMoney(totalAmount)} ₽`;
-    }
-
-    if (filtered.length === 0) {
-        box.append(createElement("p", "empty-state line-row", "Ничего не найдено. Попробуйте изменить фильтр."));
+    if (!list) {
         return;
     }
 
-    filtered.forEach(shop => {
-        const block = createElement("article", "archive-block");
-        const header = createElement("div", "archive-block-header line-row");
-        header.append(
-            createElement("h2", "archive-date", shop.date),
-            createElement("span", "archive-total", `${formatMoney(getShopTotal(shop))} ₽`)
-        );
+    const stats = document.getElementById("archive-stats");
+    const searchInput = document.getElementById("archive-search");
+    const sortInput = document.getElementById("archive-sort");
 
-        const products = createElement("div", "archive-products");
-        shop.products.forEach(item => {
-            const row = createElement("div", "archive-item line-row");
-            row.append(
-                createElement("span", item.done ? "done" : "", item.name),
-                createElement("span", "archive-item-price", `${formatMoney(item.price)} ₽`)
-            );
+    const query = searchInput?.value.trim().toLowerCase() || "";
+    const sort = sortInput?.value || "newest";
+
+    let shops = archive
+        .map((shop, index) => ({ ...shop, originalIndex: index }))
+        .filter(shop => {
+            if (!query) {
+                return true;
+            }
+
+            return shop.products.some(product => {
+                return product.name.toLowerCase().includes(query);
+            });
+        });
+
+    shops.sort((a, b) => {
+        if (sort === "oldest") {
+            return getArchiveTime(a, a.originalIndex) - getArchiveTime(b, b.originalIndex);
+        }
+
+        if (sort === "expensive") {
+            return getShopTotal(b) - getShopTotal(a);
+        }
+
+        return getArchiveTime(b, b.originalIndex) - getArchiveTime(a, a.originalIndex);
+    });
+
+    list.replaceChildren();
+
+    const productsCount = shops.reduce((sum, shop) => sum + shop.products.length, 0);
+    const amount = shops.reduce((sum, shop) => sum + getShopTotal(shop), 0);
+
+    if (stats) {
+        stats.textContent = `Записей: ${shops.length} · товаров: ${productsCount} · сумма: ${money(amount)} ₽`;
+    }
+
+    if (shops.length === 0) {
+        list.append(create("p", "empty-row", "В архиве ничего не найдено"));
+        return;
+    }
+
+    shops.forEach(shop => {
+        const card = create("article", "archive-card");
+
+        const header = create("header", "archive-card-header");
+
+        const date = create("h2", "archive-date", shop.date);
+        const total = create("strong", "archive-total", `${money(getShopTotal(shop))} ₽`);
+
+        header.append(date, total);
+
+        const products = create("div", "archive-products");
+
+        shop.products.forEach(product => {
+            const row = create("div", "archive-product");
+
+            const name = create("span", product.done ? "done" : "", product.name);
+            const price = create("span", "archive-product-price", `${money(product.price)} ₽`);
+
+            row.append(name, price);
             products.append(row);
         });
 
-        block.append(header, products);
-        box.append(block);
+        card.append(header, products);
+        list.append(card);
     });
 }
 
 function registerServiceWorker() {
-    if (!("serviceWorker" in navigator)) return;
-
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-    });
+    if (!("serviceWorker" in navigator)) {
+        return;
+    }
 
     navigator.serviceWorker.register("service-worker.js")
         .then(registration => registration.update())
-        .catch(error => console.warn("Не удалось обновить service worker", error));
+        .catch(() => {});
 }
 
-document.getElementById("add-form")?.addEventListener("submit", addItem);
-document.getElementById("archive-search")?.addEventListener("input", renderArchive);
-document.getElementById("archive-sort")?.addEventListener("change", renderArchive);
+function init() {
+    document.getElementById("add-form")?.addEventListener("submit", addItem);
+    document.getElementById("finish-shopping")?.addEventListener("click", finishShopping);
+    document.getElementById("archive-search")?.addEventListener("input", renderArchive);
+    document.getElementById("archive-sort")?.addEventListener("change", renderArchive);
 
-render();
-renderArchive();
-registerServiceWorker();
+    renderShoppingList();
+    renderArchive();
+    registerServiceWorker();
+}
+
+init();
