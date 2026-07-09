@@ -134,6 +134,7 @@ select {
   color: var(--text);
   padding: 0 14px;
   outline: none;
+  font-size: 16px;
 }
 
 input:focus,
@@ -421,4 +422,12 @@ select:focus {
   .category-pill {
     background: #243153;
   }
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
 }
