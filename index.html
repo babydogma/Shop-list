@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Список покупок</title>
+    <meta name="theme-color" content="#fff8e8">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main class="notebook">
+        <section class="screen" aria-labelledby="page-title">
+            <header class="top">
+                <h1 id="page-title">Список покупок</h1>
+            </header>
+
+            <form class="add-form" id="add-form" autocomplete="off">
+                <label class="field field-name" for="item">
+                    <span class="field-label">Что купить</span>
+                    <input
+                        id="item"
+                        name="item"
+                        type="text"
+                        placeholder="молоко, хлеб, кофе"
+                        required
+                    >
+                </label>
+
+                <label class="field field-quantity" for="quantity">
+                    <span class="field-label">Количество</span>
+                    <input
+                        id="quantity"
+                        name="quantity"
+                        type="number"
+                        inputmode="numeric"
+                        min="1"
+                        step="1"
+                        placeholder="1"
+                    >
+                </label>
+
+                <label class="field field-price" for="price">
+                    <span class="field-label">Цена</span>
+                    <input
+                        id="price"
+                        name="price"
+                        type="number"
+                        inputmode="decimal"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                    >
+                </label>
+
+                <button class="add-button" type="submit">
+                    Добавить
+                </button>
+            </form>
+
+            <section class="list-wrap" aria-label="Текущий список покупок">
+                <div class="shopping-list" id="list"></div>
+            </section>
+
+            <footer class="bottom-panel">
+                <div class="totals" aria-label="Итоги">
+                    <div class="total-line">
+                        <span>Всего</span>
+                        <strong><span id="total">0</span> ₽</strong>
+                    </div>
+                    <div class="total-line remaining-line">
+                        <span>Осталось</span>
+                        <strong><span id="remaining">0</span> ₽</strong>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="primary-button" id="finish-shopping" type="button">
+                        Завершить покупки
+                    </button>
+
+                    <a class="secondary-button" href="archive.html">
+                        Архив покупок
+                    </a>
+                </div>
+            </footer>
+        </section>
+    </main>
+</body>
+</html>
