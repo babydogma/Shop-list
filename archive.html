@@ -4,41 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Архив покупок</title>
+    <meta name="theme-color" content="#fff8e8">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
-    <meta name="theme-color" content="#f8f0d8">
+    <script src="script.js" defer></script>
 </head>
 <body>
-    <main class="page">
-        <section class="sheet-card" aria-labelledby="archive-title">
-            <header class="hero line-row">
-                <p class="eyebrow">прошлые чеки</p>
+    <main class="notebook">
+        <section class="screen" aria-labelledby="archive-title">
+            <header class="top">
                 <h1 id="archive-title">Архив покупок</h1>
             </header>
 
-            <nav class="archive-nav line-row" aria-label="Навигация">
-                <a href="index.html" class="archive-link back-link">← Назад к покупкам</a>
+            <nav class="archive-nav" aria-label="Навигация">
+                <a class="secondary-button back-button" href="index.html">
+                    ← К списку
+                </a>
             </nav>
 
-            <section class="archive-filters line-row" aria-label="Фильтры архива">
-                <label class="field filter-search" for="archive-search">
-                    <span>Найти продукт</span>
-                    <input id="archive-search" type="search" placeholder="например, кофе" autocomplete="off">
+            <section class="archive-controls" aria-label="Фильтры архива">
+                <label class="field archive-search-field" for="archive-search">
+                    <span class="field-label">Поиск</span>
+                    <input
+                        id="archive-search"
+                        type="search"
+                        placeholder="найти продукт"
+                        autocomplete="off"
+                    >
                 </label>
-                <label class="field filter-sort" for="archive-sort">
-                    <span>Порядок</span>
+
+                <label class="field archive-sort-field" for="archive-sort">
+                    <span class="field-label">Сортировка</span>
                     <select id="archive-sort">
                         <option value="newest">сначала новые</option>
                         <option value="oldest">сначала старые</option>
-                        <option value="expensive">дороже</option>
+                        <option value="expensive">сначала дорогие</option>
                     </select>
                 </label>
             </section>
 
-            <div class="archive-stats line-row" id="archive-stats"></div>
-            <div class="archive-list" id="archive-list" aria-live="polite"></div>
+            <div class="archive-stats" id="archive-stats"></div>
+
+            <section class="archive-list" id="archive-list" aria-label="Архив покупок"></section>
         </section>
     </main>
-
-    <script src="script.js"></script>
 </body>
 </html>
