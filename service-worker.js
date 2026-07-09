@@ -1,4 +1,4 @@
-const CACHE = "shopping-list-v6";
+const CACHE = "shopping-list-v7";
 const FILES = [
     "./",
     "./index.html",
